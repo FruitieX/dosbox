@@ -472,6 +472,7 @@ Bitu Module::CtrlRead( void ) {
 
 
 void Module::PortWrite( Bitu port, Bitu val, Bitu iolen ) {
+    printf("PortWrite(): %04x,%04x,%04x\n", port, val, iolen);
 	//Keep track of last write time
 	lastUsed = PIC_Ticks;
 	//Maybe only enable with a keyon?
@@ -547,40 +548,52 @@ void Module::PortWrite( Bitu port, Bitu val, Bitu iolen ) {
 
 
 Bitu Module::PortRead( Bitu port, Bitu iolen ) {
+    Bitu read_value = 0;
+
 	switch ( mode ) {
 	case MODE_OPL2:
 		//We allocated 4 ports, so just return -1 for the higher ones
 		if ( !(port & 3 ) ) {
 			//Make sure the low bits are 6 on opl2
-			return chip[0].Read() | 0x6;
+            read_value = chip[0].Read() | 0x6;
+            break;
 		} else {
-			return 0xff;
+            read_value = chip[0].Read() | 0x6;
+            break;
 		}
 	case MODE_OPL3GOLD:
 		if ( ctrl.active ) {
 			if ( port == 0x38a ) {
-				return 0; //Control status, not busy
+				read_value = 0; //Control status, not busy
+                break;
 			} else if ( port == 0x38b ) {
-				return CtrlRead();
+				read_value = CtrlRead();
+                break;
 			}
 		}
 		//Fall-through if not handled by control chip
 	case MODE_OPL3:
 		//We allocated 4 ports, so just return -1 for the higher ones
 		if ( !(port & 3 ) ) {
-			return chip[0].Read();
+			read_value = chip[0].Read();
+            break;
 		} else {
-			return 0xff;
+			read_value = 0xff;
+            break;
 		}
 	case MODE_DUALOPL2:
 		//Only return for the lower ports
 		if ( port & 1 ) {
-			return 0xff;
+			read_value = 0xff;
+            break;
 		}
 		//Make sure the low bits are 6 on opl2
-		return chip[ (port >> 1) & 1].Read() | 0x6;
+		read_value = chip[ (port >> 1) & 1].Read() | 0x6;
+        break;
 	}
-	return 0;
+    printf("PortRead(): %04x,%04x,%04x\n", port, read_value, iolen);
+
+	return read_value;
 }
 
 
