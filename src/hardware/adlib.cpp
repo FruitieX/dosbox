@@ -472,7 +472,14 @@ Bitu Module::CtrlRead( void ) {
 
 
 void Module::PortWrite( Bitu port, Bitu val, Bitu iolen ) {
-    printf("PortWrite(): %04x,%04x,%04x\n", port, val, iolen);
+    // first write the register
+    fprintf(stderr, "%c", port >> 0x08);
+    // then write the address
+    fprintf(stderr, "%02x", port & 0xFF);
+    // then comes the data
+    fprintf(stderr, "%02x", val);
+
+    //printf("PortWrite(): %04x,%04x,%04x\n", port, val, iolen);
 	//Keep track of last write time
 	lastUsed = PIC_Ticks;
 	//Maybe only enable with a keyon?
@@ -591,7 +598,8 @@ Bitu Module::PortRead( Bitu port, Bitu iolen ) {
 		read_value = chip[ (port >> 1) & 1].Read() | 0x6;
         break;
 	}
-    printf("PortRead(): %04x,%04x,%04x\n", port, read_value, iolen);
+    // TODO: reading data
+    // printf("PortRead(): %04x,%04x,%04x\n", port, read_value, iolen);
 
 	return read_value;
 }
