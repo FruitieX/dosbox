@@ -473,9 +473,10 @@ Bitu Module::CtrlRead( void ) {
 
 void Module::PortWrite( Bitu port, Bitu val, Bitu iolen ) {
     // first write the register
-    fprintf(stderr, "%c", port >> 0x08);
+    //fprintf(stderr, "%c", port >> 0x08);
     // then write the address
-    fprintf(stderr, "%02x", port & 0xFF);
+    fprintf(stderr, "%c", port - 0x388);
+    //fprintf(stderr, "%02x", port & 0xFF);
     // then comes the data
     fprintf(stderr, "%02x", val);
 
